@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles.css') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='icon.png') }}" />
+    <title>Search Demo</title>
+</head>
+<body>
+  <h1>ML Powered Search</h1>
+    <p>This search is powered by Large language models such at GPT, BERT and sentence-transformers!</p>
+    <p>Type your search query below!</p>
+    <form action="\submit-search" method="post" id="submission-form">
+        <ul>
+            <li>
+              <label for="prompt">Query:</label>
+              <input type="text" id="prompt" name="prompt-input" />
+            </li>
+            <li class="button">
+                <button type="submit">Search</button>
+            </li>
+          </ul>
+    </form>
+    <label>{{generated_text}}</label>
+</body>
+</html>
+

@@ -27,7 +27,7 @@ from transformers import BartTokenizer, BartForConditionalGeneration
 
 gen_model = "vblagoje/bart_lfqa"
 # load bart tokenizer and model from huggingface
-tokenizer = BartTokenizer.from_pretrained(gen_model)
+tokenizer = BartTokenizer.from_pretrained(gen_model).to(device)
 generator = BartForConditionalGeneration.from_pretrained(gen_model).to(device)
 
 print(f'Loaded generator pipeline model {gen_model}')

@@ -22,6 +22,16 @@ return (
     )
 }
 
+const LFQAResult = props =>{
+const item = props.lfqa_result;
+
+return (
+    <div class='rel_lfqa_result'>
+        <div class='rel_content'> {item.gen_content} </div>
+    </div>
+    )
+}
+
 const ResultsList = props => {
     const lst = props.results;
 
@@ -52,3 +62,4 @@ const QAList = props => {
 
 ReactDOM.render(<ResultsList results={results} />, document.getElementById('search-result') );
 ReactDOM.render(<QAList qa_results={qa_results} />, document.getElementById('factoidqa') );
+ReactDOM.render(<LFQAResult lfqa_result={lfqa_result} />, document.getElementById('lfqa') );

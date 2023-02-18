@@ -11,6 +11,8 @@
     <script>
         var results = {{ results | tojson }}
         var qa_results = {{ qa_results | tojson }}
+        var lfqa_result = {{ lfqa_result | tojson }}
+        var vars = {{ vars | tojson }}
     </script>
 </head>
 <body>
@@ -18,17 +20,31 @@
     ML Powered Search
 </div>
 <div id="controls">
-    <div id="cbox">
-        <form action="/submit-search" method="post" id="submission-form">
-            <!-- the search box, allowing us to search by keywords -->
-            <input name="query" type="text" id="qfield" value="">
-            <input type="submit" value="Submit">
-        </form>
+    <div>
+        <div id="cbox">
+            <form action="/submit-search" method="get" id="search">
+                <!-- the search box, allowing us to search by keywords -->
+                <input name="query" type="text" id="qfield" value="{{ vars.search_query }}">
+
+                <!-- Enabled / Disable Generative QA system -->
+                <label for="gen_qa">Generate Answer: </label>
+                <select name="gen_qa" id="gen_qa">
+                    <option value="yes" {{ vars.gen_qa == 'yes' and 'selected' }}>yes</option>
+                    <option value="no" {{ vars.gen_qa == 'no' and 'selected' }}>no</option>
+                </select>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
     </div>
 </div>
 
 {% if qa_results %}
 <div id="factoidqa">
+</div>
+{% endif %}
+
+{% if lfqa_result %}
+<div id="lfqa">
 </div>
 {% endif %}
 

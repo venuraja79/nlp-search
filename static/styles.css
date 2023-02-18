@@ -6,12 +6,13 @@ body {
     background-color: #eee;
 }
 #header {
-    height: 24px;
-    background-color: #92a8d1;
+    height: 30px;
+    background-color: #4682B4;
     color: white;
     padding-top: 8px;
     padding-left: 10px;
     border-bottom: 1px solid #622;
+    font-size: 20px
 }
 #home-link {
     display: inline-block;
@@ -43,7 +44,14 @@ body {
 .rel_qa_result {
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #FFF0F5;
+    background-color: #F0F8FF;
+    border-radius: 5px;
+}
+
+.rel_lfqa_result {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #B0C4DE;
     border-radius: 5px;
 }
 
@@ -73,67 +81,27 @@ body {
     background-position: left center;
     outline: 0;
   }
+#sbox {
+    width: 100%;
+}
+#cbox {
+    margin-top: 5px;
+    font-size: 14px;
+}
+#cbox input {
+    margin-bottom: 5px;
+}
+#cbox_fast {
+    font-size: 14px;
+}
+#cbox_fast a {
+    display: inline-block;
+    background-color: #eee;
+    padding: 3px;
+}
 #search-result{
     margin: 10px 40px 0 40px;
     font-size: 18px;
-}
-
-label {
-    /* Uniform size & alignment */
-    display: inline-block;
-    width: 90px;
-    text-align: right;
-}
-
-input,
-textarea {
-    /* To make sure that all text fields have the same font settings
-         By default, textareas have a monospace font */
-    font: 1em sans-serif;
-
-    /* Uniform text field size */
-    width: 300px;
-    box-sizing: border-box;
-
-    /* Match form field borders */
-    border: 1px solid #999;
-}
-
-input:focus,
-textarea:focus {
-    /* Additional highlight for focused elements */
-    border-color: #000;
-}
-
-textarea {
-    /* Align multiline text fields with their labels */
-    vertical-align: top;
-
-    /* Provide space to type some text */
-    height: 5em;
-}
-
-.button {
-    /* Align buttons with the text fields */
-    padding-left: 90px;
-    /* same size as the label elements */
-}
-
-button {
-    /* This extra margin represent roughly the same space as the space
-         between the labels and their text fields */
-    margin-left: 0.5em;
-}
-
-label,
-input {
-    display: flex;
-    flex-direction: column;
-}
-
-input,
-label {
-    display: block;
 }
 
 mark {

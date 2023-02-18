@@ -22,6 +22,15 @@ model_name = "deepset/electra-base-squad2"
 reader = pipeline(tokenizer=model_name, model=model_name, task="question-answering", device=device)
 print(f'Loaded reader pipeline model {model_name}')
 
+from transformers import BartTokenizer, BartForConditionalGeneration
+
+gen_model = "vblagoje/bart_lfqa"
+# load bart tokenizer and model from huggingface
+tokenizer = BartTokenizer.from_pretrained(gen_model)
+generator = BartForConditionalGeneration.from_pretrained(gen_model).to(device)
+
+print(f'Loaded generator pipeline model {gen_model}')
+
 pinecone_key = os.getenv(PINECONE_KEY)
 
 if os.getenv("index_name"):
@@ -38,7 +47,10 @@ run_with_ngrok(app)
 
 @app.route('/')
 def initial():
-  search_result = {"results":'', "qa_results":''}
+  search_result = {"results":'', "qa_results":'', "lfqa_result": ''}
+  search_result['vars'] = {}
+  search_result['vars']['search_query'] = ''
+  search_result['vars']['gen_qa'] = 'no'
   return render_template('index.html', **search_result)
 
 def qa_pipeline(question, context):
@@ -55,15 +67,31 @@ def qa_pipeline(question, context):
     sorted_result = sorted(results, key=lambda x: x["score"], reverse=True)
     return sorted_result[0:1]
 
-@app.route('/submit-search', methods=['POST'])
+def lfqa_pipeline(question, context):
+    context = [f"<P> {m['metadata']['context']}" for m in context]
+    # concatinate all context passages
+    context = " ".join(context)
+    # contcatinate the query and context passages
+    query = f"question: {question} context: {context}"
+
+    # tokenize the query to get input_ids
+    inputs = tokenizer([query], max_length=1024, return_tensors="pt")
+    # use generator to predict output ids
+    ids = generator.generate(inputs["input_ids"], num_beams=12, min_length=20, max_length=200, temperature=0.8)
+    # use tokenizer to decode the output ids
+    answer = tokenizer.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
+    return answer
+
+@app.route('/submit-search', methods=['get'])
 def perform_search():
-  prompt = request.form['query']
-  print(f"Generating search results for : {prompt}")
+  s_query = request.args.get('query',' ')
+  s_gen_qa = request.args.get('gen_qa', 'no')
+  print(f"Generating search results for : {s_query}")
 
   # Get pinecone index
   index = pinecone.Index(index_name=INDEX_NAME)
 
-  vector_embedding = model.encode(prompt).tolist()
+  vector_embedding = model.encode(s_query).tolist()
   response = index.query([vector_embedding], top_k=5, include_metadata=True)
 
   search_result = {}
@@ -78,10 +106,19 @@ def perform_search():
 
       # QA pipeline
       context = [x["metadata"]["context"] for x in response["matches"]]
-      qa_result = qa_pipeline(prompt, context[:2])
+      qa_result = qa_pipeline(s_query, context[:3])
 
-      search_result = {"results": results, "qa_results": qa_result}
+      if s_gen_qa == 'yes':
+          lfqa_context = response['matches']
+          gen_answer = lfqa_pipeline(s_query, lfqa_context)
+      else:
+          gen_answer = ''
 
+      search_result = {"results": results, "qa_results": qa_result, "lfqa_result": {"gen_content": gen_answer}}
+
+  search_result['vars'] = {}
+  search_result['vars']['search_query'] = s_query
+  search_result['vars']['gen_qa'] = s_gen_qa
   print(f"Sending search results ... {search_result}")
   return render_template('index.html', **search_result)
 

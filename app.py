@@ -17,18 +17,18 @@ model = SentenceTransformer(MODEL_NAME, device=device)
 print(f'Loaded the Model {MODEL_NAME}')
 
 from transformers import pipeline
-device = 0 if torch.cuda.is_available() else -1
+x_device = 0 if torch.cuda.is_available() else -1
 model_name = "deepset/electra-base-squad2"
 # load the reader model into a question-answering pipeline
-reader = pipeline(tokenizer=model_name, model=model_name, task="question-answering", device=device)
+reader = pipeline(tokenizer=model_name, model=model_name, task="question-answering", device=x_device)
 print(f'Loaded reader pipeline model {model_name}')
 
 from transformers import BartTokenizer, BartForConditionalGeneration
 
 gen_model = "vblagoje/bart_lfqa"
 # load bart tokenizer and model from huggingface
-tokenizer = BartTokenizer.from_pretrained(gen_model).to(device)
-generator = BartForConditionalGeneration.from_pretrained(gen_model).to(device)
+tokenizer = BartTokenizer.from_pretrained(gen_model)
+generator = BartForConditionalGeneration.from_pretrained(gen_model).to(x_device)
 
 print(f'Loaded generator pipeline model {gen_model}')
 
@@ -72,13 +72,13 @@ def lfqa_pipeline(question, context):
     context = [f"<P> {m['metadata']['context']}" for m in context]
     # concatinate all context passages
     context = " ".join(context)
-    # contcatinate the query and context passages
+    # concatenate the query and context passages
     query = f"question: {question} context: {context}"
 
     # tokenize the query to get input_ids
     inputs = tokenizer([query], max_length=1024, return_tensors="pt")
     # use generator to predict output ids
-    ids = generator.generate(inputs["input_ids"], num_beams=12, min_length=20, max_length=200, temperature=0.8)
+    ids = generator.generate(inputs["input_ids"].to(x_device), num_beams=12, min_length=20, max_length=200, temperature=0.8)
     # use tokenizer to decode the output ids
     answer = tokenizer.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
     return answer

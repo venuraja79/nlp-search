@@ -17,6 +17,7 @@ model = SentenceTransformer(MODEL_NAME, device=device)
 print(f'Loaded the Model {MODEL_NAME}')
 
 from transformers import pipeline
+device = 0 if torch.cuda.is_available() else -1
 model_name = "deepset/electra-base-squad2"
 # load the reader model into a question-answering pipeline
 reader = pipeline(tokenizer=model_name, model=model_name, task="question-answering", device=device)

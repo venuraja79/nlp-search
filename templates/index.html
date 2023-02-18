@@ -8,23 +8,43 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles.css') }}" />
     <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='icon.png') }}" />
     <title>Search Demo</title>
+    <script>
+        var results = {{ results | tojson }}
+        var qa_results = {{ qa_results | tojson }}
+    </script>
 </head>
 <body>
-  <h1>ML Powered Search</h1>
-    <p>This search is powered by Large language models such at GPT, BERT and sentence-transformers!</p>
-    <p>Type your search query below!</p>
-    <form action="\submit-search" method="post" id="submission-form">
-        <ul>
-            <li>
-              <label for="prompt">Query:</label>
-              <input type="text" id="prompt" name="prompt-input" />
-            </li>
-            <li class="button">
-                <button type="submit">Search</button>
-            </li>
-          </ul>
-    </form>
-    <label>{{generated_text}}</label>
+<div id="header">
+    ML Powered Search
+</div>
+<div id="controls">
+    <div id="cbox">
+        <form action="/submit-search" method="post" id="submission-form">
+            <!-- the search box, allowing us to search by keywords -->
+            <input name="query" type="text" id="qfield" value="">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+{% if qa_results %}
+<div id="factoidqa">
+</div>
+{% endif %}
+
+{% if results %}
+<div id="search-result">
+</div>
+{% endif %}
+
+<!-- React -->
+<script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Babel for displaying JSX -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<!-- Load our React component -->
+<script src="{{ url_for('static', filename='results.js') }}" type="text/babel"></script>
 </body>
+
 </html>
 
